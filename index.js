@@ -10,7 +10,6 @@ const allowedOrigins = [
   "http://localhost:3000",
   "https://aeli-madagascar.vercel.app",
 ];
-
 const corsOptions = {
   origin: function (origin, callback) {
     // autoriser les requêtes sans origin (comme Postman) ou celles venant d'une origine valide
@@ -31,18 +30,17 @@ const port = process.env.PORT;
 dbConnect();
 app.use(express.json());
 // ***********//
-const applicationRoutes = require("./routes/registerRoutes");
+
 const userRoutes = require("./routes/userRoutes");
 const authRoutes = require("./routes/authRoutes");
-const coursRoutes = require("./routes/coursRoutes");
+const candidateRoutes = require("./routes/candidateRoutes");
 app.listen(port, () => {
   console.log(`app listening on port ${port}`);
 });
 //routes
-app.use("/api/register", applicationRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
-app.use("/api/cours", coursRoutes);
+app.use("/api/candidate", candidateRoutes);
 //Gestion des erreurs
 app.use(notFound);
 app.use(globalErrHandler);

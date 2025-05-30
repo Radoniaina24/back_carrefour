@@ -29,26 +29,14 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["super_admin", "admin", "student"],
+      enum: ["super_admin", "admin", "candidate", "recruiter"],
       required: true,
     },
-    student: {
+    candidate: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Register",
+      ref: "Candidate",
       required: false,
     },
-    status: {
-      type: String,
-      required: true,
-      enum: ["paid", "unpaid"],
-      default: "unpaid",
-    },
-    schoolFees: {
-      type: Number,
-      required: true,
-      enum: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-      default: 0,
-    }, // écolage par mois
   },
   { timestamps: true }
 );
