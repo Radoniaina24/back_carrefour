@@ -1,4 +1,3 @@
-const cloudinary = require("cloudinary").v2;
 const Candidate = require("../models/candidateModel");
 const User = require("../models/userModel");
 // POST /api/candidate
@@ -70,46 +69,44 @@ const createCandidate = async (req, res) => {
   }
 };
 // Get /api/register
-// const getAllCandidate = async (req, res) => {
-//   try {
-//     const { page = 1, limit = 10, search, status, sort } = req.query;
-//     // Construction dynamique des filtres
-//     const filters = {};
+const getAllCandidate = async (req, res) => {
+  try {
+    const { page = 1, limit = 10, search, sort } = req.query;
+    // Construction dynamique des filtres
+    const filters = {};
 
-//     if (search) {
-//       filters.$or = [
-//         { lastName: { $regex: search, $options: "i" } },
-//         {
-//           firstName: { $regex: search, $options: "i" },
-//         },
-//       ];
-//     }
-//     if (status && status !== "all") {
-//       filters.status = status;
-//     }
-//     const sortOption = sort === "asc" ? 1 : -1;
+    if (search) {
+      filters.$or = [
+        { lastName: { $regex: search, $options: "i" } },
+        {
+          firstName: { $regex: search, $options: "i" },
+        },
+      ];
+    }
 
-//     const totalApplications = await Register.countDocuments(filters);
-//     const totalPages = Math.ceil(totalApplications / limit);
+    const sortOption = sort === "asc" ? 1 : -1;
 
-//     const applications = await Register.find(filters)
-//       .sort({
-//         createdAt: sortOption,
-//       })
-//       .skip((page - 1) * limit)
-//       .limit(limit);
+    const totalCandidates = await Candidate.countDocuments(filters);
+    const totalPages = Math.ceil(totalCandidates / limit);
 
-//     res.status(200).json({
-//       totalApplications,
-//       totalPages,
-//       currentPage: parseInt(page),
-//       applications,
-//     });
-//   } catch (error) {
-//     console.error("Erreur lors de la récupération des candidatures :", error);
-//     res.status(500).json({ message: "Erreur interne du serveur" });
-//   }
-// };
+    const candidates = await Candidate.find(filters)
+      .sort({
+        createdAt: sortOption,
+      })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    res.status(200).json({
+      totalCandidates,
+      totalPages,
+      currentPage: parseInt(page),
+      candidates,
+    });
+  } catch (error) {
+    console.error("Erreur lors de la récupération des candidatures :", error);
+    res.status(500).json({ message: "Erreur interne du serveur" });
+  }
+};
 // // Get by id /api/regiter/id
 // const getApplicationById = async (req, res) => {
 //   try {
@@ -172,43 +169,44 @@ const createCandidate = async (req, res) => {
 //     res.status(500).json({ message: "Erreur interne du serveur" });
 //   }
 // };
-// // Update by id /api/regiter/id
-// const updateApplication = async (req, res) => {
-//   try {
-//     const { status } = req.body;
-//     const { id } = req.params;
+// Update by id /api/regiter/id
+const updateCandidate = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const { id } = req.params;
 
-//     const register = await Register.findById(id);
-//     if (!register) {
-//       return res.status(404).json({ message: "Candidat non trouvée" });
-//     }
+    const candidate = await Candidate.findById(id);
+    if (!candidate) {
+      return res.status(404).json({ message: "Candidat non trouvée" });
+    }
 
-//     register.status = status || register.status;
-//     await register.save();
-//     //create new user
-//     const role = "student";
-//     if (register.status === "approved") {
-//       const user = new User({
-//         lastName: register.lastName,
-//         firstName: register.firstName,
-//         email: register.emailAddress,
-//         password: "123456789a",
-//         role,
-//         student: register._id,
-//         status: "unpaid",
-//       });
-//       await user.save();
-//     }
+    candidate.status = status || candidate.status;
+    await candidate.save();
+    //create new user
+    const role = "candidate";
+    if (candidate.status === "approved") {
+      const user = new User({
+        lastName: candidate.lastName,
+        firstName: candidate.firstName,
+        email: candidate.emailAddress,
+        password: "123456789a",
+        role,
+        candidate: candidate._id,
+      });
+      await user.save();
+    }
 
-//     res
-//       .status(200)
-//       .json({ message: "Status mise à jour avec succès", register });
-//   } catch (error) {
-//     console.error("Erreur lors de la mise à jour :", error);
-//     res.status(500).json({ message: "Erreur interne du serveur" });
-//   }
-// };
+    res
+      .status(200)
+      .json({ message: "Status mise à jour avec succès", candidate });
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour :", error);
+    res.status(500).json({ message: "Erreur interne du serveur" });
+  }
+};
 
 module.exports = {
   createCandidate,
+  getAllCandidate,
+  updateCandidate,
 };
