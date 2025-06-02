@@ -1,4 +1,5 @@
 const Candidate = require("../models/candidateModel");
+const cloudinary = require("cloudinary").v2;
 const User = require("../models/userModel");
 // POST /api/candidate
 const createCandidate = async (req, res) => {
@@ -31,6 +32,7 @@ const createCandidate = async (req, res) => {
       postalCode,
       country,
       sector,
+      category,
     } = req.body;
 
     if (emailAddress !== confirmEmailAddress) {
@@ -51,6 +53,7 @@ const createCandidate = async (req, res) => {
       postalCode,
       country,
       sector,
+      category,
       coverLetter: uploadedFiles.coverLetter,
       cv: uploadedFiles.cv,
       degree: uploadedFiles.degree,
@@ -68,10 +71,10 @@ const createCandidate = async (req, res) => {
       .json({ message: "Une erreur interne s'est produite." });
   }
 };
-// Get /api/register
+// GET /api/candidate
 const getAllCandidate = async (req, res) => {
   try {
-    const { page = 1, limit = 10, search, sort } = req.query;
+    const { page = 1, limit = 10, search, sort, status } = req.query;
     // Construction dynamique des filtres
     const filters = {};
 
@@ -83,7 +86,9 @@ const getAllCandidate = async (req, res) => {
         },
       ];
     }
-
+    if (status && status !== "all") {
+      filters.status = status;
+    }
     const sortOption = sort === "asc" ? 1 : -1;
 
     const totalCandidates = await Candidate.countDocuments(filters);
@@ -107,74 +112,60 @@ const getAllCandidate = async (req, res) => {
     res.status(500).json({ message: "Erreur interne du serveur" });
   }
 };
-// // Get by id /api/regiter/id
-// const getApplicationById = async (req, res) => {
-//   try {
-//     const application = await Register.findById(req.params.id);
-//     if (!application) {
-//       return res.status(404).json({ message: "Candidature non trouvée" });
-//     }
-//     res.status(200).json(application);
-//   } catch (error) {
-//     console.error("Erreur lors de la récupération :", error);
-//     res.status(500).json({ message: "Erreur interne du serveur" });
-//   }
-// };
-// // Delete by id /api/regiter/id
-// const deleteApplication = async (req, res) => {
-//   try {
-//     const { id } = req.params;
 
-//     const application = await Register.findById(id);
-//     if (!application) {
-//       return res.status(404).json({ message: "Candidature non trouvée" });
-//     }
+// Delete /api/candidate
+const deletCandidate = async (req, res) => {
+  try {
+    const { id } = req.params;
 
-//     // Suppression du fichier dans cloudinary
-//     const resourceType = application.cv.type === "pdf" ? "raw" : "image";
-//     const documentsToDelete = [
-//       { key: "cv", type: resourceType },
-//       { key: "cin", type: resourceType },
-//       { key: "degree", type: resourceType },
-//       { key: "birthCertificate", type: resourceType },
-//       { key: "certificateOfResidence", type: resourceType },
-//       { key: "photo", type: "image" },
-//       { key: "gradeTranscript", type: resourceType },
-//     ];
+    const candidate = await Candidate.findById(id);
+    if (!candidate) {
+      return res.status(404).json({ message: "Candidature non trouvée" });
+    }
 
-//     for (const doc of documentsToDelete) {
-//       const file = application[doc.key];
-//       if (file?.publicId) {
-//         try {
-//           await cloudinary.uploader.destroy(file.publicId, {
-//             resource_type: doc.type,
-//           });
-//           console.log(`✅ ${doc.key} supprimé avec succès.`);
-//         } catch (error) {
-//           console.error(
-//             `❌ Erreur lors de la suppression de ${doc.key} :`,
-//             error
-//           );
-//         }
-//       } else {
-//         console.warn(`⚠️ Aucun fichier trouvé pour ${doc.key}.`);
-//       }
-//     }
-//     // Suppression du Candidature
-//     await Register.deleteOne({ _id: id });
+    // Suppression du fichier dans cloudinary
+    const resourceType = candidate.cv.type === "pdf" ? "raw" : "image";
+    const documentsToDelete = [
+      { key: "cv", type: resourceType },
+      { key: "degree", type: resourceType },
+      { key: "photo", type: "image" },
+      { key: "coverLetter", type: resourceType },
+    ];
 
-//     res.status(200).json({ message: "Candidature supprimée avec succès" });
-//   } catch (error) {
-//     console.error("Erreur lors de la suppression :", error);
-//     res.status(500).json({ message: "Erreur interne du serveur" });
-//   }
-// };
-// Update by id /api/regiter/id
+    for (const doc of documentsToDelete) {
+      const file = candidate[doc.key];
+      if (file?.publicId) {
+        try {
+          await cloudinary.uploader.destroy(file.publicId, {
+            resource_type: doc.type,
+          });
+          console.log(`✅ ${doc.key} supprimé avec succès.`);
+        } catch (error) {
+          console.error(
+            `❌ Erreur lors de la suppression de ${doc.key} :`,
+            error
+          );
+        }
+      } else {
+        console.warn(`⚠️ Aucun fichier trouvé pour ${doc.key}.`);
+      }
+    }
+    // Suppression du Candidature
+    await Candidate.deleteOne({ _id: id });
+
+    res.status(200).json({ message: "Candidature supprimée avec succès" });
+  } catch (error) {
+    console.error("Erreur lors de la suppression :", error);
+    res.status(500).json({ message: "Erreur interne du serveur" });
+  }
+};
+// PUT /api/candidate
 const updateCandidate = async (req, res) => {
   try {
     const { status } = req.body;
     const { id } = req.params;
 
+    console.log(req.body);
     const candidate = await Candidate.findById(id);
     if (!candidate) {
       return res.status(404).json({ message: "Candidat non trouvée" });
@@ -183,18 +174,18 @@ const updateCandidate = async (req, res) => {
     candidate.status = status || candidate.status;
     await candidate.save();
     //create new user
-    const role = "candidate";
-    if (candidate.status === "approved") {
-      const user = new User({
-        lastName: candidate.lastName,
-        firstName: candidate.firstName,
-        email: candidate.emailAddress,
-        password: "123456789a",
-        role,
-        candidate: candidate._id,
-      });
-      await user.save();
-    }
+    // const role = "candidate";
+    // if (candidate.status === "approved") {
+    //   const user = new User({
+    //     lastName: candidate.lastName,
+    //     firstName: candidate.firstName,
+    //     email: candidate.emailAddress,
+    //     password: "123456789a",
+    //     role,
+    //     candidate: candidate._id,
+    //   });
+    //   await user.save();
+    // }
 
     res
       .status(200)
@@ -209,4 +200,5 @@ module.exports = {
   createCandidate,
   getAllCandidate,
   updateCandidate,
+  deletCandidate,
 };

@@ -59,6 +59,11 @@ const CandidateSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    category: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     status: {
       type: String,
       required: true,
