@@ -53,7 +53,7 @@ async function login(req, res) {
 }
 
 async function getMe(req, res) {
-  console.log("tafiditra");
+  // console.log("tafiditra");
   if (!req.user) {
     return res.status(401).json({ message: "User not authenticated" });
   }
