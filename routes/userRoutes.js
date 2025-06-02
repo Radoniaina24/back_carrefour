@@ -20,8 +20,8 @@ userRoutes.get(
 userRoutes.get("/:id", userContollers.getUserById);
 userRoutes.post(
   "/register",
-  isLoggedIn,
-  checkRole(["super_admin"]),
+  // isLoggedIn,
+  // checkRole(["super_admin"]),
   asyncHandler(userContollers.createUser)
 );
 userRoutes.put(
