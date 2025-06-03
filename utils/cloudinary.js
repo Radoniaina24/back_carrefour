@@ -42,7 +42,7 @@ const storage = new CloudinaryStorage({
     const isPdf = file.mimetype === "application/pdf";
 
     let options = {
-      folder: "Candidature",
+      folder: "Candidature Candidate",
       public_id: `${originalName}_${formattedDate}`,
     };
 
