@@ -37,6 +37,12 @@ const userSchema = new mongoose.Schema(
       ref: "Candidate",
       required: false,
     },
+    status: {
+      type: String,
+      required: true,
+      enum: ["paid", "unpaid"],
+      default: "unpaid",
+    },
   },
   { timestamps: true }
 );

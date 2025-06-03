@@ -33,6 +33,7 @@ const createCandidate = async (req, res) => {
       country,
       sector,
       category,
+      password,
     } = req.body;
 
     if (emailAddress !== confirmEmailAddress) {
@@ -61,6 +62,19 @@ const createCandidate = async (req, res) => {
       acceptConditions: true,
     });
     await newCandidate.save();
+    // création de l'utilisateur candidate
+    const role = "candidate";
+    const user = new User({
+      lastName: newCandidate.lastName,
+      firstName: newCandidate.firstName,
+      email: newCandidate.emailAddress,
+      password: password,
+      role,
+      candidate: newCandidate._id,
+      status: "unpaid",
+    });
+    await user.save();
+
     return res.status(201).json({
       message: "Candidature soumise avec succès.",
     });
@@ -152,6 +166,14 @@ const deletCandidate = async (req, res) => {
     }
     // Suppression du Candidature
     await Candidate.deleteOne({ _id: id });
+
+    // Supression de l'utilisateur
+    const user = await User.findOne({ candidate: candidate._id });
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvée" });
+    }
+
+    await User.deleteOne({ _id: user._id });
 
     res.status(200).json({ message: "Candidature supprimée avec succès" });
   } catch (error) {
