@@ -37,6 +37,11 @@ const userSchema = new mongoose.Schema(
       ref: "Candidate",
       required: false,
     },
+    recruiter: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Recruiter",
+      required: false,
+    },
     status: {
       type: String,
       required: true,

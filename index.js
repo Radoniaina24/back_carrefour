@@ -34,6 +34,7 @@ app.use(express.json());
 const userRoutes = require("./routes/userRoutes");
 const authRoutes = require("./routes/authRoutes");
 const candidateRoutes = require("./routes/candidateRoutes");
+const recruiterRoutes = require("./routes/recruiterRoutes");
 app.listen(port, () => {
   console.log(`app listening on port ${port}`);
 });
@@ -41,6 +42,7 @@ app.listen(port, () => {
 app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/candidate", candidateRoutes);
+app.use("/api/recruiter", recruiterRoutes);
 //Gestion des erreurs
 app.use(notFound);
 app.use(globalErrHandler);
