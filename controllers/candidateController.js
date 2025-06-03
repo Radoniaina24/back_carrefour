@@ -195,19 +195,17 @@ const updateCandidate = async (req, res) => {
 
     candidate.status = status || candidate.status;
     await candidate.save();
-    //create new user
-    // const role = "candidate";
-    // if (candidate.status === "approved") {
-    //   const user = new User({
-    //     lastName: candidate.lastName,
-    //     firstName: candidate.firstName,
-    //     email: candidate.emailAddress,
-    //     password: "123456789a",
-    //     role,
-    //     candidate: candidate._id,
-    //   });
-    //   await user.save();
-    // }
+
+    // Modification de status de l'utilisateur
+    const user = await User.findOne({ candidate: candidate._id });
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvée" });
+    }
+
+    user.status = "paid";
+    await user.save();
+
+    //envoi mail pour confirmation
 
     res
       .status(200)
