@@ -32,25 +32,25 @@ const getAllUsers = async (req, res) => {
     const filters = {};
     const allowedRoles = ["admin", "super_admin"];
 
-    if (role && role !== "all") {
-      const requestedRoles = role
-        .split(",")
-        .map((r) => r.trim())
-        .filter((r) => allowedRoles.includes(r));
+    // if (role && role !== "all") {
+    //   const requestedRoles = role
+    //     .split(",")
+    //     .map((r) => r.trim())
+    //     .filter((r) => allowedRoles.includes(r));
 
-      if (requestedRoles.length > 0) {
-        filters.role = { $in: requestedRoles };
-      } else {
-        // Si aucun rôle valide fourni, retourner une erreur ou ignorer
-        return res.status(400).json({
-          message:
-            "Rôle invalide. Seuls 'admin' ou 'super_admin' sont autorisés.",
-        });
-      }
-    } else {
-      // Par défaut, on affiche les deux
-      filters.role = { $in: allowedRoles };
-    }
+    //   if (requestedRoles.length > 0) {
+    //     filters.role = { $in: requestedRoles };
+    //   } else {
+    //     // Si aucun rôle valide fourni, retourner une erreur ou ignorer
+    //     return res.status(400).json({
+    //       message:
+    //         "Rôle invalide. Seuls 'admin' ou 'super_admin' sont autorisés.",
+    //     });
+    //   }
+    // } else {
+    //   // Par défaut, on affiche les deux
+    //   filters.role = { $in: allowedRoles };
+    // }
 
     if (search) {
       filters.$or = [
@@ -64,7 +64,6 @@ const getAllUsers = async (req, res) => {
     const totalUsers = await User.countDocuments(filters);
     const totalPages = Math.ceil(totalUsers / limit);
     const users = await User.find(filters)
-      .select("-status -schoolFees")
       .skip((page - 1) * limit)
       .limit(limit);
     res.status(200).json({
