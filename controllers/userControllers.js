@@ -28,30 +28,32 @@ const createUser = async (req, res) => {
 //obtenir tout les utilisateurs différent de role student
 const getAllUsers = async (req, res) => {
   try {
-    const { page = 1, limit = 10, search, role } = req.query;
+    const { page = 1, limit = 10, search, role, status } = req.query;
     const filters = {};
-    const allowedRoles = ["admin", "super_admin"];
+    const allowedRoles = ["candidate", "recruiter"];
 
-    // if (role && role !== "all") {
-    //   const requestedRoles = role
-    //     .split(",")
-    //     .map((r) => r.trim())
-    //     .filter((r) => allowedRoles.includes(r));
+    if (role && role !== "all") {
+      const requestedRoles = role
+        .split(",")
+        .map((r) => r.trim())
+        .filter((r) => allowedRoles.includes(r));
 
-    //   if (requestedRoles.length > 0) {
-    //     filters.role = { $in: requestedRoles };
-    //   } else {
-    //     // Si aucun rôle valide fourni, retourner une erreur ou ignorer
-    //     return res.status(400).json({
-    //       message:
-    //         "Rôle invalide. Seuls 'admin' ou 'super_admin' sont autorisés.",
-    //     });
-    //   }
-    // } else {
-    //   // Par défaut, on affiche les deux
-    //   filters.role = { $in: allowedRoles };
-    // }
-
+      if (requestedRoles.length > 0) {
+        filters.role = { $in: requestedRoles };
+      } else {
+        // Si aucun rôle valide fourni, retourner une erreur ou ignorer
+        return res.status(400).json({
+          message:
+            "Rôle invalide. Seuls 'admin' ou 'super_admin' sont autorisés.",
+        });
+      }
+    } else {
+      // Par défaut, on affiche les deux
+      filters.role = { $in: allowedRoles };
+    }
+    if (status && status !== "all") {
+      filters.status = status;
+    }
     if (search) {
       filters.$or = [
         { lastName: { $regex: search, $options: "i" } },
