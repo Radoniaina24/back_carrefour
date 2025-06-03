@@ -89,52 +89,23 @@ const getAllRecruiter = async (req, res) => {
   }
 };
 
-// Delete /api/candidate
+// Delete /api/recruiter
 const deletRecruiter = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const candidate = await Recruiter.findById(id);
-    if (!candidate) {
+    const recruiter = await Recruiter.findById(id);
+    if (!recruiter) {
       return res.status(404).json({ message: "Candidature non trouvée" });
-    }
-
-    // Suppression du fichier dans cloudinary
-    const resourceType = candidate.cv.type === "pdf" ? "raw" : "image";
-    const documentsToDelete = [
-      { key: "cv", type: resourceType },
-      { key: "degree", type: resourceType },
-      { key: "photo", type: "image" },
-      { key: "coverLetter", type: resourceType },
-    ];
-
-    for (const doc of documentsToDelete) {
-      const file = candidate[doc.key];
-      if (file?.publicId) {
-        try {
-          await cloudinary.uploader.destroy(file.publicId, {
-            resource_type: doc.type,
-          });
-          console.log(`✅ ${doc.key} supprimé avec succès.`);
-        } catch (error) {
-          console.error(
-            `❌ Erreur lors de la suppression de ${doc.key} :`,
-            error
-          );
-        }
-      } else {
-        console.warn(`⚠️ Aucun fichier trouvé pour ${doc.key}.`);
-      }
     }
     // Suppression du Candidature
     await Recruiter.deleteOne({ _id: id });
 
     // Supression de l'utilisateur
-    const user = await User.findOne({ candidate: candidate._id });
+    const user = await User.findOne({ recruiter: recruiter._id });
     if (!user) {
       return res.status(404).json({ message: "Utilisateur non trouvée" });
     }
-
     await User.deleteOne({ _id: user._id });
 
     res.status(200).json({ message: "Candidature supprimée avec succès" });
@@ -143,23 +114,23 @@ const deletRecruiter = async (req, res) => {
     res.status(500).json({ message: "Erreur interne du serveur" });
   }
 };
-// PUT /api/candidate
+// PUT /api/recruiter
 const updateRecruiter = async (req, res) => {
   try {
     const { status } = req.body;
     const { id } = req.params;
 
-    console.log(req.body);
-    const candidate = await Recruiter.findById(id);
-    if (!candidate) {
-      return res.status(404).json({ message: "Candidat non trouvée" });
+    // console.log(req.body);
+    const recruiter = await Recruiter.findById(id);
+    if (!recruiter) {
+      return res.status(404).json({ message: "Recruteur non trouvée" });
     }
 
-    candidate.status = status || candidate.status;
-    await candidate.save();
+    recruiter.status = status || recruiter.status;
+    await recruiter.save();
 
     // Modification de status de l'utilisateur
-    const user = await User.findOne({ candidate: candidate._id });
+    const user = await User.findOne({ recruiter: recruiter._id });
     if (!user) {
       return res.status(404).json({ message: "Utilisateur non trouvée" });
     }
@@ -171,7 +142,7 @@ const updateRecruiter = async (req, res) => {
 
     res
       .status(200)
-      .json({ message: "Status mise à jour avec succès", candidate });
+      .json({ message: "Status mise à jour avec succès", recruiter });
   } catch (error) {
     console.error("Erreur lors de la mise à jour :", error);
     res.status(500).json({ message: "Erreur interne du serveur" });
@@ -181,6 +152,6 @@ const updateRecruiter = async (req, res) => {
 module.exports = {
   createRecruiter,
   getAllRecruiter,
-  //   updateRecruiter,
-  //   deletRecruiter,
+  updateRecruiter,
+  deletRecruiter,
 };

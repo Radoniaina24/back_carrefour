@@ -4,6 +4,6 @@ const recruiterController = require("../controllers/recruiterController");
 
 recruiterRouter.post("/", recruiterController.createRecruiter);
 recruiterRouter.get("/", recruiterController.getAllRecruiter);
-// recruiterRouter.put("/:id", candidateController.updateCandidate);
-// recruiterRouter.delete("/:id", candidateController.deletCandidate);
+recruiterRouter.put("/:id", recruiterController.updateRecruiter);
+recruiterRouter.delete("/:id", recruiterController.deletRecruiter);
 module.exports = recruiterRouter;
