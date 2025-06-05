@@ -14,7 +14,7 @@ const sendEmail = async (options) => {
   });
 
   const mailOptions = {
-    from: `"Votre Société" <${process.env.EMAIL_USER}>`,
+    from: `Carrefour d'emploi Madagascar`,
     to: options.to,
     subject: options.subject,
     html: options.html,

@@ -1,6 +1,8 @@
 const Candidate = require("../models/candidateModel");
 const cloudinary = require("cloudinary").v2;
 const User = require("../models/userModel");
+const message = require("../TemplateMail");
+const sendEmail = require("../utils/sendEmail");
 // POST /api/candidate
 const createCandidate = async (req, res) => {
   if (!req.files) {
@@ -197,6 +199,13 @@ const updateCandidate = async (req, res) => {
     await candidate.save();
 
     //envoi mail pour confirmation
+    if (status === "approved") {
+      await sendEmail({
+        to: "nintsoaandriam@gmail.com",
+        subject: "Validation du dossier",
+        html: message,
+      });
+    }
 
     res
       .status(200)
