@@ -196,15 +196,6 @@ const updateCandidate = async (req, res) => {
     candidate.status = status || candidate.status;
     await candidate.save();
 
-    // Modification de status de l'utilisateur
-    const user = await User.findOne({ candidate: candidate._id });
-    if (!user) {
-      return res.status(404).json({ message: "Utilisateur non trouvée" });
-    }
-
-    user.status = "paid";
-    await user.save();
-
     //envoi mail pour confirmation
 
     res

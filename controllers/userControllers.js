@@ -131,29 +131,22 @@ const getUserById = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
-//modifier tout les utilisateurs différent de role student
+
 const updateUser = async (req, res) => {
   try {
-    const { lastName, firstName, email, password, role } = req.body;
-    // Création d'un objet updateData contenant uniquement les champs valides
-    const updateData = { lastName, firstName, email, role };
+    const { status } = req.body;
+    const { id } = req.params;
 
-    // Si un mot de passe est fourni, on le hash avant la mise à jour
-    if (password) {
-      const salt = await bcrypt.genSalt(10);
-      updateData.password = await bcrypt.hash(password, salt);
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvée" });
     }
-    const user = await User.findByIdAndUpdate(req.params.id, updateData, {
-      new: true,
-      runValidators: true,
-    }).select("-password");
-    if (!user)
-      return res.status(404).json({ message: "Utilisateur non trouvé" });
-    res
-      .status(200)
-      .json({ message: "Utilisateur mis à jour avec succès", user });
+    user.status = status || user.status;
+    await user.save();
+    res.status(200).json({ message: "Status mise à jour avec succès", user });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error("Erreur lors de la mise à jour :", error);
+    res.status(500).json({ message: "Erreur interne du serveur" });
   }
 };
 

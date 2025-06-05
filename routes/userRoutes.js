@@ -27,7 +27,7 @@ userRoutes.post(
 userRoutes.put(
   "/update/:id",
   isLoggedIn,
-  checkRole(["super_admin"]),
+  checkRole(["super_admin", "admin"]),
   asyncHandler(userContollers.updateUser)
 );
 userRoutes.put(
