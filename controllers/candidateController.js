@@ -201,9 +201,14 @@ const updateCandidate = async (req, res) => {
     //envoi mail pour confirmation
     if (status === "approved") {
       await sendEmail({
-        to: "nintsoaandriam@gmail.com",
-        subject: "Validation du dossier",
+        to: "test-azwjs1p9o@srv1.mail-tester.com", // candidate.emailAddress,
+        from: `"Carrefour d'emploi Madagascar" <${process.env.EMAIL_USER}>`,
+        subject: "Confirmation de réception de votre candidature",
+        text: "",
         html: message,
+        headers: {
+          "List-Unsubscribe": "<mailto:unsubscribe@votredomaine.com>",
+        },
       });
     }
 

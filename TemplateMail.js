@@ -174,7 +174,7 @@ const message = `<div style="background-color: #f8fafc; padding: 40px 20px; min-
           <strong>Service client :</strong> +261 37 07 777 07
         </p>
         <p style="color: #6b7280; margin: 5px 0; font-size: 14px">
-          <strong>Email :</strong> carrefouremploi@gateafricagroup.com
+          <strong>Email :</strong> contact@gateafricagroup.com
         </p>
         <p style="color: #6b7280; margin: 5px 0; font-size: 14px">
           <strong>Horaires :</strong> Lundi - Vendredi, 8h00 - 17h00
