@@ -6,7 +6,10 @@ const { globalErrHandler, notFound } = require("./middlewares/globaErrHandler");
 const path = require("path");
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-const allowedOrigins = ["http://localhost:3000", "http://localhost:3000"];
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://www.carrefour-emploi.com",
+];
 const corsOptions = {
   origin: function (origin, callback) {
     // autoriser les requêtes sans origin (comme Postman) ou celles venant d'une origine valide
