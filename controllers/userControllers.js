@@ -4,7 +4,7 @@ const cloudinary = require("cloudinary").v2;
 const bcrypt = require("bcrypt");
 const createUser = async (req, res) => {
   try {
-    const { lastName, firstName, email, password, role, student } = req.body;
+    const { lastName, firstName, email, password, role } = req.body;
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res
@@ -17,7 +17,6 @@ const createUser = async (req, res) => {
       email,
       password,
       role,
-      student,
     });
     await user.save();
     res.status(201).json({ message: "Utilisateur créé avec succès", user });

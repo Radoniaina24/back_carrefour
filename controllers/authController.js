@@ -7,6 +7,7 @@ async function login(req, res) {
   try {
     const { email, password } = req.body;
 
+    // console.log("Mot de passe" + password);
     // Vérifier si les champs sont bien remplis
     if (!email || !password) {
       return res
@@ -19,7 +20,7 @@ async function login(req, res) {
     if (!userFound) {
       return res
         .status(404)
-        .json({ message: "Mot de passe ou adresse e-mail incorrecte" });
+        .json({ message: "Mot de passe ou adresse e-mail incorrecte " });
     }
     // Vérifier le mot de passe
     const isMatch = await bcrypt.compare(password, userFound.password);
