@@ -18,6 +18,11 @@ const RecruiterSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    phoneNumber: {
+      type: String,
+      required: [true, "Le numéro de téléphone est requis"],
+      trim: true,
+    },
     country: {
       type: String,
       required: true,

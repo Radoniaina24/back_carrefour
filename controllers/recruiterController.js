@@ -5,8 +5,15 @@ const User = require("../models/userModel");
 const createRecruiter = async (req, res) => {
   try {
     // Récupération des données depuis le body
-    const { lastName, firstName, emailAddress, country, company, password } =
-      req.body;
+    const {
+      lastName,
+      firstName,
+      emailAddress,
+      country,
+      company,
+      password,
+      phoneNumber,
+    } = req.body;
     // verification si 'email est déja utilisé
     const emailExist = await User.findOne({ email: emailAddress });
     if (emailExist) {
@@ -22,6 +29,7 @@ const createRecruiter = async (req, res) => {
       country,
       company,
       password,
+      phoneNumber,
     });
     await newRecruiter.save();
     // création de l'utilisateur candidate
