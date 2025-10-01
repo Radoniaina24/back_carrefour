@@ -67,17 +67,21 @@ async function getMe(req, res) {
 }
 
 async function logout(req, res) {
-  res.clearCookie("accessToken", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // Utiliser HTTPS en production
-    sameSite: "Strict", // Pour éviter le CSRF
-  });
-  res.clearCookie("refreshToken", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // Utiliser HTTPS en production
-    sameSite: "Strict", // Pour éviter le CSRF
-  });
-  res.json({ message: "User logged out successfully" });
+  try {
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      path: "/",
+    };
+
+    res.clearCookie("accessToken", cookieOptions);
+    res.clearCookie("refreshToken", cookieOptions);
+
+    return res.json({ message: "User logged out successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 }
 async function refreshAccessToken(req, res) {
   try {
